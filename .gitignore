@@ -1,0 +1,25 @@
+# KiCad backup & temporary files
+*.bak
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*-backups/
+_saved-*/
+fp-info-cache
+*.lck
+
+# Editor and local backup history
+.history/
+.vscode/
+.idea/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Arduino build / compilation output
+build/
+Output/
+*.elf
+*.bin
+*.hex
