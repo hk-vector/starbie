@@ -79,3 +79,9 @@ Open **Sketch > Include Library > Manage Libraries** and install:
 You can personalize Starbie's behaviors under the `BEGINNER SETTINGS` block at the top of `Starbie.ino`:
 * **Menu Items:** Edit names and stat changes in `MENU_ITEMS[]`.
 * **Custom Artwork:** Replace `PET_SPRITE[]` with custom 1-bit byte array bitmaps converted via [image2cpp](https://javl.github.io/image2cpp/).
+
+---
+
+## Starbie PCB Render
+
+![Starbie PCB Render](Hardware/Assets/starbie_render.png)

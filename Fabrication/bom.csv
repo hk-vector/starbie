@@ -1,0 +1,8 @@
+Item,Reference,Qty,Value,Device,Package,Description,Manufacturer,MPN
+1,U1,1,XIAO ESP32C3,Seeed Studio XIAO ESP32C3,Module_14Pin_21x17.8mm,Wi-Fi & BLE Microcontroller Board with RISC-V Core,Seeed Studio,102010428
+2,DISP1,1,"0.96"" OLED 128x64",SSD1306 OLED Module,Header_1x04_P2.54mm,0.96 inch I2C OLED Display Module (128x64),Generic / Adafruit,SSD1306-OLED-0.96
+3,U2,1,MPU6050,MPU-6050 Accelerometer + Gyroscope Module,Header_1x08_P2.54mm,6-Axis Motion Tracking I2C Sensor Module,InvenSense / Generic,GY-521
+4,S1,1,DHT11,DHT11 Temperature & Humidity Sensor,Header_1x03_P2.54mm,Digital Temperature and Humidity Sensor Module,Aosong / Generic,DHT11
+5,"SW1, SW2",2,Tactile Switch,SPST-NO Tactile Switch,SW_PUSH_6mm,6x6mm Side/Top Actuated Tactile Pushbutton,C&K / Generic,PTS645
+6,R1,1,10kΩ,Resistor,R_0805_2012Metric,10k Ohm 1% 1/8W SMD Resistor (Pull-up),Yageo,RC0805FR-0710KL
+7,"J1, J2",2,1x07 Pin Socket,2.54mm Female Header,PinHeader_1x07_P2.54mm,2.54mm Pitch 1x7 Socket Header for XIAO ESP32C3,Sullins / Generic,PPPC071LFBN-RC
