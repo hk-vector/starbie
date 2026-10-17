@@ -82,6 +82,25 @@ You can personalize Starbie's behaviors under the `BEGINNER SETTINGS` block at t
 
 ---
 
-## Starbie PCB Render
+## Bill of Materials (BOM)
+
+| Part | Description / Function | Qty | Unit Price (USD) | Total Price (USD) | Vendor |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **Seeed Studio XIAO ESP32-C3** | Main microcontroller running the code | 1 | $7.74 | $7.74 | [robu.in](https://robu.in/product/seeed-studio-xiao-esp32c3-tiny-mcu-board-with-wi-fi-and-ble-battery-charge-supported-power-efficiency-and-rich-interface/) |
+| **0.96" OLED Screen (128x64 I2C)** | Displays text and project data | 1 | $1.93 | $1.93 | [thingbits.in](https://www.thingbits.in/products/0-96-inch-oled-128x64-display-board-with-i2c) |
+| **DHT11 Sensor** | Measures temperature and relative humidity | 1 | $1.54 | $1.54 | [robu.in](https://robu.in/product/dht-11-digital-temperature-and-humidity-sensor/) |
+| **Mechanical Keyboard Switches** | User input and button presses | 1 | $9.26 | $9.26 | [amazon.in](https://www.amazon.in/piercing-Mechanical-Keyboard-Switches-Universal/dp/B0G39H2G4H/) |
+| **10 kΩ Resistor Pack** | Pulls up the data line | 1 | $0.12 | $0.12 | [amazon.in](https://www.amazon.in/Electronic-Spices-Tolerance-Through-Resistors/dp/B0BDV2T3PX/) |
+| **GY-521 MPU6050** | Detects motion and board orientation | 1 | $2.77 | $2.77 | [amazon.in](https://www.amazon.in/Robocraze-MPU-6050-Gyroscope-Accelerometer-Arduino/dp/B07H3XH1TB/) |
+| **1x40 Female Header Strip** | Socket connectors for plug-in modules | 1 | $0.13 | $0.13 | [robu.in](https://robu.in/product/1-40-pin-2-54m-straight-long-female-berg-strip-connector-pack-of-5/) |
+| **1x40 Male Header Strip (3 Pack)** | Pin connectors for module wiring | 1 | $0.18 | $0.18 | [robu.in](https://robu.in/product/2-54mm-1x40-pin-male-single-row-straight-long-header-strip-pack-of-3/) |
+| **Tax & Shipping** | Estimated shipping and handling for order | — | — | $1.86 | — |
+| **TOTAL** | | | | **$25.53** | |
+
+---
+
+## Starbie PCB Photos
 
 ![Starbie PCB Render](Hardware/Assets/starbie_render.png)
+![Starbie PCB Schematic](Hardware/Assets/starbie_schematic.png)
+![Starbie PCB Design](Hardware/Assets/starbie_pcb_design.png)
