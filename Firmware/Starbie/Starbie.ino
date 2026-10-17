@@ -45,6 +45,8 @@ const uint8_t MPU6050_ADDRESS = 0x68;
 const int STARTING_JOY = 70;
 const int STARTING_ENERGY = 75;
 const int STARTING_FULLNESS = 65;
+const int STARTING_LEVEL = 1;
+const int STARTING_XP = 0;
 
 // Set true, upload once, then set it back to false if you want a fresh pet.
 const bool RESET_SAVED_PET_ON_BOOT = false;
@@ -64,14 +66,15 @@ struct MenuItem {
   int joyChange;
   int energyChange;
   int fullnessChange;
+  int xpGain;
   PetReaction reaction;
 };
 
 const MenuItem MENU_ITEMS[] = {
-  {"NAP",   1,  18, -4, NAP_REACTION},   // top: sleep and emit Zs
-  {"PLAY", 12, -9, -5, RUN_REACTION},    // right: two fast laps + hearts
-  {"FEED",  3,  2,  18, JUMP_REACTION},  // bottom: wiggle and jump
-  {"PET",   7,  0,  0, HEART_REACTION},  // left: jump and emit hearts
+  {"NAP",   1,  18, -4, 10, NAP_REACTION},   // top: sleep and emit Zs
+  {"PLAY", 12,  -9, -5, 25, RUN_REACTION},   // right: two fast laps + hearts
+  {"FEED",  3,   2,  18, 15, JUMP_REACTION},  // bottom: wiggle and jump
+  {"PET",   7,   0,   0, 20, HEART_REACTION},  // left: jump and emit hearts
 };
 const int MENU_ITEM_COUNT = sizeof(MENU_ITEMS) / sizeof(MENU_ITEMS[0]);
 
@@ -94,6 +97,7 @@ const float SHAKE_THRESHOLD = 7.0f;
 const int SHAKE_JOY_CHANGE = 5;
 const int SHAKE_ENERGY_CHANGE = -2;
 const int SHAKE_FULLNESS_CHANGE = -1;
+const int SHAKE_XP_GAIN = 5;
 
 // --- Your pet's bitmap and animation -------------------------------------
 // This is a simplified 32 by 32, one-bit version of the supplied character.
@@ -177,6 +181,8 @@ struct PetState {
   int joy;
   int energy;
   int fullness;
+  int level;
+  int xp;
 };
 
 struct ButtonState {
@@ -192,7 +198,7 @@ enum View {
   STATS_VIEW,
 };
 
-PetState pet = {STARTING_JOY, STARTING_ENERGY, STARTING_FULLNESS};
+PetState pet = {STARTING_JOY, STARTING_ENERGY, STARTING_FULLNESS, STARTING_LEVEL, STARTING_XP};
 ButtonState buttonOne = {BUTTON_ONE_PIN, HIGH, HIGH, 0};
 ButtonState buttonTwo = {BUTTON_TWO_PIN, HIGH, HIGH, 0};
 View currentView = PET_VIEW;
@@ -225,10 +231,19 @@ int keepInRange(int value, int smallest, int largest) {
   return constrain(value, smallest, largest);
 }
 
-void changePet(int joyChange, int energyChange, int fullnessChange) {
+void addXp(int amount) {
+  pet.xp += amount;
+  if (pet.xp >= 100) {
+    pet.xp -= 100;
+    pet.level++;
+  }
+}
+
+void changePet(int joyChange, int energyChange, int fullnessChange, int xpGain) {
   pet.joy = keepInRange(pet.joy + joyChange, 0, 100);
   pet.energy = keepInRange(pet.energy + energyChange, 0, 100);
   pet.fullness = keepInRange(pet.fullness + fullnessChange, 0, 100);
+  addXp(xpGain);
 }
 
 void loadPet() {
@@ -239,12 +254,16 @@ void loadPet() {
   pet.joy = preferences.getInt("joy", STARTING_JOY);
   pet.energy = preferences.getInt("energy", STARTING_ENERGY);
   pet.fullness = preferences.getInt("full", STARTING_FULLNESS);
+  pet.level = preferences.getInt("level", STARTING_LEVEL);
+  pet.xp = preferences.getInt("xp", STARTING_XP);
 }
 
 void savePet() {
   preferences.putInt("joy", pet.joy);
   preferences.putInt("energy", pet.energy);
   preferences.putInt("full", pet.fullness);
+  preferences.putInt("level", pet.level);
+  preferences.putInt("xp", pet.xp);
 }
 
 void setUpButton(ButtonState &button) {
@@ -385,7 +404,7 @@ void checkForShake() {
     lastShakeAt = now;
     nappingUntil = 0;  // A shake wakes a sleeping pet right away.
     shakeAnimationEndsAt = now + 350;
-    changePet(SHAKE_JOY_CHANGE, SHAKE_ENERGY_CHANGE, SHAKE_FULLNESS_CHANGE);
+    changePet(SHAKE_JOY_CHANGE, SHAKE_ENERGY_CHANGE, SHAKE_FULLNESS_CHANGE, SHAKE_XP_GAIN);
     savePet();
   }
 }
@@ -406,7 +425,7 @@ void chooseMenuItem() {
   }
 
   const MenuItem &item = MENU_ITEMS[selectedMenuItem];
-  changePet(item.joyChange, item.energyChange, item.fullnessChange);
+  changePet(item.joyChange, item.energyChange, item.fullnessChange, item.xpGain);
   savePet();
   const uint32_t now = millis();
   nappingUntil = 0;
@@ -456,6 +475,13 @@ void drawHeart(int x, int y) {
   display.drawPixel(x, y + 6, SSD1306_WHITE);
 }
 
+void drawCrown(int x, int y) {
+  display.drawPixel(x, y, SSD1306_WHITE);
+  display.drawPixel(x + 2, y, SSD1306_WHITE);
+  display.drawPixel(x + 4, y, SSD1306_WHITE);
+  display.fillRect(x, y + 1, 5, 2, SSD1306_WHITE);
+}
+
 void drawHearts(uint32_t now, int petX, int petY) {
   if (now >= heartAnimationEndsAt) {
     return;
@@ -464,8 +490,8 @@ void drawHearts(uint32_t now, int petX, int petY) {
   const float progress =
       1.0f - static_cast<float>(heartAnimationEndsAt - now) / HEARTS_DURATION_MS;
   const int rise = static_cast<int>(progress * 18.0f);
-  drawHeart(petX + 10, petY - 3 - rise);
-  drawHeart(petX + 22, petY - 9 - rise / 2);
+  drawHeart(petX + 10, petY - (3 * rise));
+  drawHeart(petX + 22, petY - (8 * rise / 2));
 }
 
 void drawSleepZs(uint32_t now, int petX, int petY) {
@@ -473,9 +499,9 @@ void drawSleepZs(uint32_t now, int petX, int petY) {
   const int rise = static_cast<int>((now / 300UL) % 15UL);
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(petX + 23, petY - 2 - rise);
+  display.setCursor(petX + 23, petY - (2 * rise));
   display.print("z");
-  display.setCursor(petX + 28, petY - 8 - rise / 2);
+  display.setCursor(petX + 28, petY - (8 * rise / 2));
   display.print("z");
 }
 
@@ -511,6 +537,10 @@ void drawPet() {
   petX = constrain(petX, 0, SCREEN_WIDTH - PET_SPRITE_WIDTH);
   display.drawBitmap(petX, petY, PET_SPRITE, PET_SPRITE_WIDTH, PET_SPRITE_HEIGHT,
                      SSD1306_WHITE);
+
+  if (pet.level >= 2 && !isNapping()) {
+    drawCrown(petX + 14, petY - 4);
+  }
 
   if (isNapping()) {
     drawSleepZs(now, petX, petY);
@@ -567,9 +597,16 @@ void drawStatBar(int y, const char *label, int value) {
 
 void drawStats() {
   display.clearDisplay();
-  drawStatBar(5, "JOY", pet.joy);
-  drawStatBar(20, "ENERGY", pet.energy);
-  drawStatBar(35, "FULL", pet.fullness);
+  drawStatBar(2, "JOY", pet.joy);
+  drawStatBar(14, "ENERGY", pet.energy);
+  drawStatBar(26, "FULL", pet.fullness);
+
+  display.setCursor(4, 40);
+  display.print("LVL ");
+  display.print(pet.level);
+  display.print("  XP ");
+  display.print(pet.xp);
+  display.print("/100");
 
   display.setCursor(4, 53);
   if (!isnan(temperatureC)) {
